@@ -19,11 +19,11 @@ func main() {
 	var m int = 100
 	fmt.Println("the value is:", m)
 	fmt.Printf(" 100 as binary : %b", m)
-	fmt.Printf(" 100 as hexadecimal : %x", m)
+	fmt.Printf(" 100 as hexadecimal : %x \n", m)
 
-	a, b, c, d := 0, 1, 2, 3
-	fmt.Printf("%v \t %b \t %x", a, a, a)
-	fmt.Printf("%v \t %b \t %x", b, b, b)
-	fmt.Printf("%v \t %b \t %x", c, c, c)
-	fmt.Printf("%v \t %b \t %x", d, d, d)
+	a, b, c, d := 0, 1, 2, 42
+	fmt.Printf("%v \t %b \t %x \n", a, a, a)
+	fmt.Printf("%v \t %b \t %x \n", b, b, b)
+	fmt.Printf("%v \t %b \t %x \n", c, c, c)
+	fmt.Printf("%v \t %b \t %x \n", d, d, d)
 }
