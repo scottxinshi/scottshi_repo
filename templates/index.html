@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canadian Coupon Collector</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --secondary-color: #ffffff;
+            --success-color: #388e3c;
+            --warning-color: #ff9f00;
+            --danger-color: #ff6161;
+            --dark-color: #212121;
+            --light-color: #f1f3f6;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff0000 0%, #ffffff 50%, #ff0000 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .search-section {
+            padding: 2rem;
+            background: var(--light-color);
+            border-radius: 15px;
+            margin: 1rem;
+        }
+
+        .form-control, .btn {
+            border-radius: 10px;
+            border: none;
+            padding: 12px 20px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+        }
+
+        .price-tag {
+            background: var(--success-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .discount-badge {
+            background: var(--warning-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .retailer-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #ff0000, #ffffff);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .tab-content {
+            padding: 1rem;
+        }
+
+        .nav-tabs .nav-link {
+            border-radius: 10px 10px 0 0;
+            border: none;
+            color: var(--dark-color);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .maple-leaf {
+            color: #ff0000;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fas fa-tags"></i> Canadian Coupon Collector <span class="maple-leaf">🍁</span></h1>
+                <p class="mb-0">Find the best deals and lowest prices across Canadian retailers</p>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="searchInput" class="form-label">
+                                <i class="fas fa-search"></i> Search Product/Category
+                            </label>
+                            <input type="text" class="form-control" id="searchInput" 
+                                   placeholder="e.g., Pepsi, Electronics, Maple Syrup...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="limitInput" class="form-label">
+                                <i class="fas fa-list-ol"></i> Number of Results
+                            </label>
+                            <input type="number" class="form-control" id="limitInput" 
+                                   value="10" min="1" max="50">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button class="btn btn-primary" onclick="searchCoupons()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-grid">
+                            <button class="btn btn-success" onclick="findLowestPrice()">
+                                <i class="fas fa-arrow-down"></i> Find Lowest Price
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-grid">
+                            <button class="btn btn-warning" onclick="findTopCheapest()">
+                                <i class="fas fa-trophy"></i> Top Cheapest
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-grid">
+                            <button class="btn btn-info" onclick="getCategories()">
+                                <i class="fas fa-th-large"></i> Browse Categories
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Searching Canadian retailers...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="tab-content">
+                <ul class="nav nav-tabs" id="resultTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="search-tab" data-bs-toggle="tab" 
+                                data-bs-target="#search-results" type="button" role="tab">
+                            <i class="fas fa-search"></i> Search Results
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="lowest-tab" data-bs-toggle="tab" 
+                                data-bs-target="#lowest-price" type="button" role="tab">
+                            <i class="fas fa-arrow-down"></i> Lowest Price
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="cheapest-tab" data-bs-toggle="tab" 
+                                data-bs-target="#top-cheapest" type="button" role="tab">
+                            <i class="fas fa-trophy"></i> Top Cheapest
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="categories-tab" data-bs-toggle="tab" 
+                                data-bs-target="#categories" type="button" role="tab">
+                            <i class="fas fa-th-large"></i> Categories
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="retailers-tab" data-bs-toggle="tab" 
+                                data-bs-target="#retailers" type="button" role="tab">
+                            <i class="fas fa-store"></i> Canadian Retailers
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="resultTabContent">
+                    <!-- Search Results -->
+                    <div class="tab-pane fade show active" id="search-results" role="tabpanel">
+                        <div id="searchResults"></div>
+                    </div>
+
+                    <!-- Lowest Price -->
+                    <div class="tab-pane fade" id="lowest-price" role="tabpanel">
+                        <div id="lowestPriceResult"></div>
+                    </div>
+
+                    <!-- Top Cheapest -->
+                    <div class="tab-pane fade" id="top-cheapest" role="tabpanel">
+                        <div id="topCheapestResult"></div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="tab-pane fade" id="categories" role="tabpanel">
+                        <div id="categoriesResult"></div>
+                    </div>
+
+                    <!-- Retailers -->
+                    <div class="tab-pane fade" id="retailers" role="tabpanel">
+                        <div id="retailersResult"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-card">
+                <h5><i class="fas fa-chart-bar"></i> Statistics <span class="maple-leaf">🍁</span></h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="totalSearches">0</h4>
+                            <small>Total Searches</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="totalCoupons">0</h4>
+                            <small>Coupons Found</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="lastSearch">-</h4>
+                            <small>Last Search</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="errors">0</h4>
+                            <small>Errors</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentSearchTerm = '';
+
+        // Show loading
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.main-container').insertBefore(alertDiv, document.querySelector('.search-section'));
+        }
+
+        // Format price (Canadian dollars)
+        function formatPrice(price) {
+            if (!price) return 'N/A';
+            return `C$${price.toLocaleString('en-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        // Create product card
+        function createProductCard(coupon) {
+            return `
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <img src="${coupon.image_url || 'https://via.placeholder.com/100x100?text=No+Image'}" 
+                                     class="product-image" alt="${coupon.title}">
+                            </div>
+                            <div class="col-md-7">
+                                <h6 class="card-title">${coupon.title}</h6>
+                                <div class="mb-2">
+                                    <span class="price-tag">${formatPrice(coupon.current_price)}</span>
+                                    ${coupon.original_price && coupon.original_price !== coupon.current_price ? 
+                                        `<span class="text-muted text-decoration-line-through ms-2">${formatPrice(coupon.original_price)}</span>` : ''}
+                                    ${coupon.discount_percentage ? 
+                                        `<span class="discount-badge ms-2">${coupon.discount_percentage}% OFF</span>` : ''}
+                                    ${coupon.retailer ? 
+                                        `<span class="retailer-badge">${coupon.retailer}</span>` : ''}
+                                </div>
+                                ${coupon.rating ? `<div class="mb-2"><i class="fas fa-star text-warning"></i> ${coupon.rating} (${coupon.reviews})</div>` : ''}
+                                <small class="text-muted">Category: ${coupon.category}</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-grid">
+                                    <a href="${coupon.product_link}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-external-link-alt"></i> View Deal
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Search coupons
+        async function searchCoupons() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const limit = document.getElementById('limitInput').value;
+
+            if (!searchTerm) {
+                showAlert('Please enter a search term', 'warning');
+                return;
+            }
+
+            currentSearchTerm = searchTerm;
+            showLoading();
+
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        category: searchTerm,
+                        limit: parseInt(limit)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const resultsDiv = document.getElementById('searchResults');
+                    if (data.coupons.length === 0) {
+                        resultsDiv.innerHTML = '<div class="alert alert-info">No coupons found for this search term.</div>';
+                    } else {
+                        resultsDiv.innerHTML = `
+                            <div class="alert alert-success">
+                                Found ${data.total_found} deals for "${data.search_term}" across Canadian retailers
+                            </div>
+                            ${data.coupons.map(coupon => createProductCard(coupon)).join('')}
+                        `;
+                    }
+                    
+                    // Switch to search results tab
+                    new bootstrap.Tab(document.getElementById('search-tab')).show();
+                } else {
+                    showAlert(data.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Error searching for coupons: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+                updateStats();
+            }
+        }
+
+        // Find lowest price
+        async function findLowestPrice() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+
+            if (!searchTerm) {
+                showAlert('Please enter a product name', 'warning');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch('/lowest-price', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product: searchTerm
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.lowest_price) {
+                    const resultDiv = document.getElementById('lowestPriceResult');
+                    const lowest = data.lowest_price;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-trophy"></i> Lowest Price Found! <span class="maple-leaf">🍁</span></h5>
+                            <p>Product: ${lowest.product}</p>
+                        </div>
+                        ${createProductCard({
+                            title: lowest.title,
+                            current_price: lowest.lowest_price,
+                            discount_percentage: lowest.discount_percentage,
+                            product_link: lowest.product_link,
+                            image_url: lowest.image_url,
+                            retailer: lowest.retailer,
+                            category: lowest.product
+                        })}
+                    `;
+                } else {
+                    document.getElementById('lowestPriceResult').innerHTML = 
+                        '<div class="alert alert-warning">No lowest price found for this product.</div>';
+                }
+                
+                // Switch to lowest price tab
+                new bootstrap.Tab(document.getElementById('lowest-tab')).show();
+            } catch (error) {
+                showAlert('Error finding lowest price: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+                updateStats();
+            }
+        }
+
+        // Find top cheapest
+        async function findTopCheapest() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const limit = document.getElementById('limitInput').value;
+
+            if (!searchTerm) {
+                showAlert('Please enter a product name', 'warning');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch('/top-cheapest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product: searchTerm,
+                        limit: parseInt(limit)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const resultDiv = document.getElementById('topCheapestResult');
+                    if (data.cheapest_coupons.length === 0) {
+                        resultDiv.innerHTML = '<div class="alert alert-info">No coupons found for this product.</div>';
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="alert alert-success">
+                                <h5><i class="fas fa-list-ol"></i> Top ${data.total_found} Cheapest Deals <span class="maple-leaf">🍁</span></h5>
+                                <p>Product: ${searchTerm}</p>
+                            </div>
+                            ${data.cheapest_coupons.map(coupon => createProductCard(coupon)).join('')}
+                        `;
+                    }
+                    
+                    // Switch to top cheapest tab
+                    new bootstrap.Tab(document.getElementById('cheapest-tab')).show();
+                } else {
+                    showAlert(data.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Error finding top cheapest: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+                updateStats();
+            }
+        }
+
+        // Get categories
+        async function getCategories() {
+            showLoading();
+
+            try {
+                const response = await fetch('/categories');
+                const data = await response.json();
+
+                if (data.success) {
+                    const resultDiv = document.getElementById('categoriesResult');
+                    const categoriesHtml = data.categories.map(category => 
+                        `<button class="btn btn-outline-primary m-1" onclick="searchCategory('${category}')">${category}</button>`
+                    ).join('');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-th-large"></i> Available Categories <span class="maple-leaf">🍁</span></h5>
+                            <p>Click on a category to search for deals</p>
+                        </div>
+                        <div class="text-center">
+                            ${categoriesHtml}
+                        </div>
+                    `;
+                } else {
+                    showAlert(data.error, 'danger');
+                }
+                
+                // Switch to categories tab
+                new bootstrap.Tab(document.getElementById('categories-tab')).show();
+            } catch (error) {
+                showAlert('Error loading categories: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Get retailers
+        async function getRetailers() {
+            showLoading();
+
+            try {
+                const response = await fetch('/retailers');
+                const data = await response.json();
+
+                if (data.success) {
+                    const resultDiv = document.getElementById('retailersResult');
+                    const retailersHtml = data.retailers.map(retailer => 
+                        `<div class="btn btn-outline-danger m-1">${retailer}</div>`
+                    ).join('');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-store"></i> Canadian Retailers <span class="maple-leaf">🍁</span></h5>
+                            <p>We search across these major Canadian retailers for the best deals</p>
+                        </div>
+                        <div class="text-center">
+                            ${retailersHtml}
+                        </div>
+                    `;
+                } else {
+                    showAlert(data.error, 'danger');
+                }
+                
+                // Switch to retailers tab
+                new bootstrap.Tab(document.getElementById('retailers-tab')).show();
+            } catch (error) {
+                showAlert('Error loading retailers: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Search by category
+        function searchCategory(category) {
+            document.getElementById('searchInput').value = category;
+            searchCoupons();
+        }
+
+        // Update stats
+        async function updateStats() {
+            try {
+                const response = await fetch('/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('totalSearches').textContent = stats.total_searches;
+                    document.getElementById('totalCoupons').textContent = stats.total_coupons_found;
+                    document.getElementById('lastSearch').textContent = stats.last_search ? 
+                        new Date(stats.last_search).toLocaleString() : '-';
+                    document.getElementById('errors').textContent = stats.errors.length;
+                }
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            
+            // Enter key to search
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchCoupons();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
